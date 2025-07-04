@@ -7,9 +7,14 @@ from google.oauth2 import service_account
 import pandas as pd
 from io import BytesIO
 
+if os.path.exists(".env"):
+    st.write("Loading environment variables from local .env file")
+    import dotenv
+    dotenv.load_dotenv()
+
 # Read environment variables set via GitHub Codespaces secrets
-BUCKET_NAME = os.environ.get("GCP_BUCKET_NAME", "YOUR_BUCKET_NAME")
-FOLDER_NAME = os.environ.get("GCP_FOLDER_NAME", "YOUR_FOLDER_NAME/")  # e.g., 'myfolder/'
+BUCKET_NAME = os.environ.get("GCP_BUCKET_NAME")
+FOLDER_NAME = os.environ.get("GCP_FOLDER_NAME")
 
 def get_storage_client():
     credentials_info = os.environ.get("GCP_CREDENTIALS")
@@ -58,17 +63,16 @@ try:
         df = pd.DataFrame(files)
         st.table(df)
         for file in files:
-            col1, col2 = st.columns([8, 1])
+            col1, col2, col3 = st.columns([6, 2, 2])
             with col1:
                 st.write(file["Name"])
             with col2:
-                # Download button
                 file_name = file["Name"]
                 if st.button("Delete", key=f"delete_{file_name}"):
                     delete_file(BUCKET_NAME, file_name)
                     st.success(f"Deleted {file_name}")
                     st.rerun()
-                # Download logic
+            with col3:
                 client = get_storage_client()
                 bucket = client.bucket(BUCKET_NAME)
                 blob = bucket.blob(file_name)
