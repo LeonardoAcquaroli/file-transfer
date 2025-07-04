@@ -62,10 +62,24 @@ try:
             with col1:
                 st.write(file["Name"])
             with col2:
-                if st.button("Delete", key=file["Name"]):
-                    delete_file(BUCKET_NAME, file["Name"])
-                    st.success(f"Deleted {file['Name']}")
+                # Download button
+                file_name = file["Name"]
+                if st.button("Delete", key=f"delete_{file_name}"):
+                    delete_file(BUCKET_NAME, file_name)
+                    st.success(f"Deleted {file_name}")
                     st.rerun()
+                # Download logic
+                client = get_storage_client()
+                bucket = client.bucket(BUCKET_NAME)
+                blob = bucket.blob(file_name)
+                file_bytes = blob.download_as_bytes()
+                st.download_button(
+                    label="Download",
+                    data=file_bytes,
+                    file_name=file_name.split("/")[-1],
+                    mime="application/octet-stream",
+                    key=f"download_{file_name}"
+                )
     else:
         st.write("No files found.")
 except Exception as e:
