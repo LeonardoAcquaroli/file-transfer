@@ -1,17 +1,12 @@
 import streamlit as st
-<<<<<<< HEAD
 import os
 import time
 import json
-=======
-import time
->>>>>>> e0308cd (Initial commit)
 from google.cloud import storage
 from google.oauth2 import service_account
 import pandas as pd
 from io import BytesIO
 
-<<<<<<< HEAD
 # Read environment variables set via GitHub Codespaces secrets
 BUCKET_NAME = os.environ.get("GCP_BUCKET_NAME", "YOUR_BUCKET_NAME")
 FOLDER_NAME = os.environ.get("GCP_FOLDER_NAME", "YOUR_FOLDER_NAME/")  # e.g., 'myfolder/'
@@ -22,17 +17,6 @@ def get_storage_client():
         st.error("GCP_CREDENTIALS not found in environment variables.")
         st.stop()
     credentials_info = json.loads(credentials_info)
-=======
-# Set your GCP credentials and bucket info here or use environment variables
-BUCKET_NAME = st.secrets["gcp_bucket_name"] if "gcp_bucket_name" in st.secrets else "YOUR_BUCKET_NAME"
-FOLDER_NAME = st.secrets["gcp_folder_name"] if "gcp_folder_name" in st.secrets else "YOUR_FOLDER_NAME/"  # e.g., 'myfolder/'
-
-def get_storage_client():
-    credentials_info = st.secrets["gcp_credentials"]
-    if isinstance(credentials_info, str):
-        import json
-        credentials_info = json.loads(credentials_info)
->>>>>>> e0308cd (Initial commit)
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     return storage.Client(credentials=credentials)
 
@@ -64,28 +48,17 @@ def delete_file(bucket_name, file_path):
     blob.delete()
     return True
 
-<<<<<<< HEAD
 st.title("File Transfer Service")
 
 # List files
 st.header("Loaded Files")
-=======
-st.title("File transfer service")
-
-# List files
-st.header("Loaded files")
->>>>>>> e0308cd (Initial commit)
 try:
     files = list_files(BUCKET_NAME, FOLDER_NAME)
     if files:
         df = pd.DataFrame(files)
         st.table(df)
         for file in files:
-<<<<<<< HEAD
             col1, col2 = st.columns([8, 1])
-=======
-            col1, col2 = st.columns([8,1])
->>>>>>> e0308cd (Initial commit)
             with col1:
                 st.write(file["Name"])
             with col2:
@@ -101,11 +74,7 @@ except Exception as e:
 # Upload file
 st.header("Upload a File")
 
-<<<<<<< HEAD
 # Session state
-=======
-# Session state for file uploader key and pending file
->>>>>>> e0308cd (Initial commit)
 if 'file_uploader_key' not in st.session_state:
     st.session_state['file_uploader_key'] = 0
 if 'pending_file_bytes' not in st.session_state:
@@ -119,10 +88,6 @@ uploaded_file = st.file_uploader("Choose a file to upload", key=st.session_state
 
 if uploaded_file is not None:
     existing_files = [f["Name"].split("/")[-1] for f in files]
-<<<<<<< HEAD
-=======
-    # If new file selected, store file bytes
->>>>>>> e0308cd (Initial commit)
     if st.session_state['pending_file_name'] != uploaded_file.name:
         st.session_state['pending_file_bytes'] = uploaded_file.getvalue()
         st.session_state['pending_file_name'] = uploaded_file.name
@@ -142,10 +107,6 @@ if uploaded_file is not None:
                     st.success(f"Uploaded {file_to_upload.name} (overwritten)")
                 except Exception as e:
                     st.error(f"Error uploading file: {e}")
-<<<<<<< HEAD
-=======
-                # Clear uploader and session state
->>>>>>> e0308cd (Initial commit)
                 st.session_state['file_uploader_key'] += 1
                 st.session_state['pending_file_bytes'] = None
                 st.session_state['pending_file_name'] = None
@@ -155,11 +116,7 @@ if uploaded_file is not None:
         with col2:
             if st.button("Cancel Upload", key="cancel_btn"):
                 st.info("Upload cancelled.")
-<<<<<<< HEAD
                 st.session_state['file_uploader_key'] += 1
-=======
-                st.session_state['file_uploader_key'] += 1  # Clear uploader
->>>>>>> e0308cd (Initial commit)
                 st.session_state['pending_file_bytes'] = None
                 st.session_state['pending_file_name'] = None
                 st.session_state['pending_file_type'] = None
@@ -172,16 +129,8 @@ if uploaded_file is not None:
             st.success(f"Uploaded {uploaded_file.name}")
         except Exception as e:
             st.error(f"Error uploading file: {e}")
-<<<<<<< HEAD
-=======
-        # Clear uploader and session state
->>>>>>> e0308cd (Initial commit)
         st.session_state['file_uploader_key'] += 1
         st.session_state['pending_file_bytes'] = None
         st.session_state['pending_file_name'] = None
         st.session_state['pending_file_type'] = None
-<<<<<<< HEAD
         st.rerun()
-=======
-        st.rerun() 
->>>>>>> e0308cd (Initial commit)
